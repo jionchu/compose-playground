@@ -72,7 +72,7 @@ fun HomeScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 16.dp, top = 26.dp)
             )
-
+            PopularMovieList(list = uiState.value.popularMovieList.movies)
         }
     }
 }
@@ -128,6 +128,50 @@ fun UpcomingMovieItem(movie: Movie) {
 }
 
 @Composable
-fun PopularMovie() {
+fun PopularMovieList(list: List<Movie>) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(top = 12.dp, start = 16.dp, end = 16.dp)
+    ) {
+        items(list.size) {
+            PopularMovieItem(movie = list[it])
+        }
+    }
+}
 
+@Composable
+fun PopularMovieItem(movie: Movie) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp)
+            .clip(RoundedCornerShape(5.dp))
+            .aspectRatio(1.36f),    // 가로 길이에 따라 높이 적용
+        color = MaterialTheme.colors.onSurface,
+    ) {
+        Image(
+            painter = rememberImagePainter(
+                data = "https://image.tmdb.org/t/p/w500${movie.backdropPath ?: movie.posterPath}"
+            ),
+            contentDescription = movie.title,
+            contentScale = ContentScale.FillBounds,
+        )
+        Column(
+            modifier = Modifier.padding(end = 10.dp, bottom = 12.dp),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(
+                text = movie.title ?: "",
+                fontSize = 16.sp,
+                fontFamily = Suit,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = movie.originalTitle ?: "",
+                fontSize = 12.sp,
+                fontFamily = Suit
+            )
+        }
+    }
 }

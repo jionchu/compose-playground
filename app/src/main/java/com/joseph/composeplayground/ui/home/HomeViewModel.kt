@@ -8,6 +8,7 @@ import com.joseph.composeplayground.ui.home.dto.HomeAction
 import com.joseph.composeplayground.ui.home.dto.HomeEvent
 import com.joseph.composeplayground.ui.home.dto.HomeState
 import com.joseph.composeplayground.util.LoadState
+import com.joseph.domain.usecases.FetchPopularMovieListUseCase
 import com.joseph.domain.usecases.FetchUpComingMovieListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,12 +16,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val fetchUpComingMovieListUseCase: FetchUpComingMovieListUseCase
+    private val fetchUpComingMovieListUseCase: FetchUpComingMovieListUseCase,
+    private val fetchPopularMovieListUseCase: FetchPopularMovieListUseCase
 ) : BaseViewModel<HomeState, HomeAction, HomeEvent>(HomeState.getInitial()) {
 
     init {
         viewModelScope.launch {
             fetchUpComingMovieList(uiState.value)
+            fetchPopularMovieList(uiState.value)
         }
     }
 
@@ -41,6 +44,29 @@ class HomeViewModel @Inject constructor(
                         loadState         = LoadState.Idle,
                         upComingMovieList = uiState.value.upComingMovieList.copy(
                             movies = uiState.value.upComingMovieList.movies + movieListEntity.results.map { Movie.fromEntity(it) },
+                            page   = movieListEntity.page + 1,
+                        )
+                    )
+
+                    updateState(newState)
+                },
+
+                onFailed = { message ->
+                    val newState = uiState.value.copy(loadState = LoadState.Failed)
+                    updateState(newState)
+                }
+            )
+    }
+
+    private suspend fun fetchPopularMovieList(state: HomeState) {
+        val params = FetchPopularMovieListUseCase.Params(page = state.popularMovieList.page)
+        fetchPopularMovieListUseCase.invoke(params = params)
+            .collectWithCallback(
+                onSuccess = { movieListEntity ->
+                    val newState = uiState.value.copy(
+                        loadState         = LoadState.Idle,
+                        popularMovieList = uiState.value.popularMovieList.copy(
+                            movies = uiState.value.popularMovieList.movies + movieListEntity.results.map { Movie.fromEntity(it) },
                             page   = movieListEntity.page + 1,
                         )
                     )
