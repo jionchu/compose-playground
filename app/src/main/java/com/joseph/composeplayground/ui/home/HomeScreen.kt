@@ -1,16 +1,13 @@
 package com.joseph.composeplayground.ui.home
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -64,7 +61,10 @@ fun HomeScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 16.dp, top = 26.dp)
             )
-            UpcomingMovieList(list = uiState.value.upComingMovieList.movies)
+            UpcomingMovieList(
+                list = uiState.value.upComingMovieList.movies,
+                navController = navController
+            )
             Text(
                 text = "Popular Movies",
                 fontSize = 16.sp,
@@ -72,13 +72,16 @@ fun HomeScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 16.dp, top = 26.dp)
             )
-            PopularMovieList(list = uiState.value.popularMovieList.movies)
+            PopularMovieList(
+                list = uiState.value.popularMovieList.movies,
+                navController = navController
+            )
         }
     }
 }
 
 @Composable
-fun UpcomingMovieList(list: List<Movie>) {
+fun UpcomingMovieList(list: List<Movie>, navController: NavController) {
     LazyRow(
         modifier = Modifier
             .padding(top = 12.dp)
@@ -86,18 +89,19 @@ fun UpcomingMovieList(list: List<Movie>) {
         contentPadding = PaddingValues(start = 16.dp) // clipToPadding = false
     ) {
         items(list.size) {
-            UpcomingMovieItem(movie = list[it])
+            UpcomingMovieItem(movie = list[it], navController = navController)
         }
     }
 }
 
 @Composable
-fun UpcomingMovieItem(movie: Movie) {
+fun UpcomingMovieItem(movie: Movie, navController: NavController) {
     Surface(
         modifier = Modifier
             .size(180.dp, 260.dp)
             .padding(end = 14.dp)
-            .clip(RoundedCornerShape(5.dp)),
+            .clip(RoundedCornerShape(5.dp))
+            .clickable { navController.navigate("detail_screen/${movie.id}") },
         color = MaterialTheme.colors.onSurface,
     ) {
         Image(
@@ -128,25 +132,26 @@ fun UpcomingMovieItem(movie: Movie) {
 }
 
 @Composable
-fun PopularMovieList(list: List<Movie>) {
+fun PopularMovieList(list: List<Movie>, navController: NavController) {
     LazyColumn(
         modifier = Modifier
             .padding(top = 12.dp, start = 16.dp, end = 16.dp)
     ) {
         items(list.size) {
-            PopularMovieItem(movie = list[it])
+            PopularMovieItem(movie = list[it], navController = navController)
         }
     }
 }
 
 @Composable
-fun PopularMovieItem(movie: Movie) {
+fun PopularMovieItem(movie: Movie, navController: NavController) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 12.dp)
             .clip(RoundedCornerShape(5.dp))
-            .aspectRatio(1.36f),    // 가로 길이에 따라 높이 적용
+            .aspectRatio(1.36f)    // 가로 길이에 따라 높이 적용
+            .clickable { navController.navigate("detail_screen/${movie.id}") },
         color = MaterialTheme.colors.onSurface,
     ) {
         Image(
