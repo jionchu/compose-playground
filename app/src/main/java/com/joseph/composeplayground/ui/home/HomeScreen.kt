@@ -38,7 +38,9 @@ fun HomeScreen(
 
     Surface(
         color = MaterialTheme.colors.background,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
         Column {
             Text(
@@ -133,11 +135,11 @@ fun UpcomingMovieItem(movie: Movie, navController: NavController) {
 
 @Composable
 fun PopularMovieList(list: List<Movie>, navController: NavController) {
-    LazyColumn(
+    Column(
         modifier = Modifier
             .padding(top = 12.dp, start = 16.dp, end = 16.dp)
     ) {
-        items(list.size) {
+        repeat(list.size) {
             PopularMovieItem(movie = list[it], navController = navController)
         }
     }
